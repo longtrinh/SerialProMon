@@ -274,7 +274,7 @@ namespace SerialProMon
                 }
                 else
                 {
-                    toolStripStatusLabel2.Text = "COM port not selected";
+                    toolStripStatusLabel2.Text = "COM port not selected!";
                     toolStripStatusLabel2.ForeColor = Color.Red;
                     cbbComPort.Items.Clear();
 
