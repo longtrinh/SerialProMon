@@ -349,7 +349,7 @@ namespace SerialProMon
                         timestamp = $"[{timestamp}] ";
                     }
                     richTextBox1.SelectionColor = Color.DarkMagenta;
-                    richTextBox1.AppendText($"{timestamp}{line}\n"); 
+                    richTextBox1.AppendText($"{timestamp}{line}\n");   
                 }
             }
             richTextBox1.ScrollToCaret();
