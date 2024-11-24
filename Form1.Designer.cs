@@ -73,6 +73,7 @@
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.cbxHexmode = new System.Windows.Forms.CheckBox();
             this.cbShowTimestamp = new System.Windows.Forms.CheckBox();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.statusStrip1.SuspendLayout();
             this.grbCMD.SuspendLayout();
             this.grbConfig.SuspendLayout();
@@ -589,6 +590,12 @@
             this.cbShowTimestamp.UseVisualStyleBackColor = true;
             this.cbShowTimestamp.CheckedChanged += new System.EventHandler(this.cbShowTimestamp_CheckedChanged);
             // 
+            // timer1
+            // 
+            this.timer1.Enabled = true;
+            this.timer1.Interval = 10000;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -607,6 +614,7 @@
             this.MinimumSize = new System.Drawing.Size(290, 640);
             this.Name = "Form1";
             this.Text = "Serial Monitor Professional by TTLong";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
@@ -666,6 +674,7 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.CheckBox cbxHexmode;
         private System.Windows.Forms.CheckBox cbShowTimestamp;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 

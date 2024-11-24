@@ -12,6 +12,7 @@ namespace SerialProMon
     {
         bool hexmode = false;
         private bool showTimestamp = true;
+        private ManagementEventWatcher watcher;
         public Form1()
         {
             InitializeComponent();
@@ -75,7 +76,6 @@ namespace SerialProMon
                 {
                     btnConnect.Enabled = false;
                 }
-                  
             }
 
             if (serialPort1.IsOpen == true)
@@ -102,6 +102,8 @@ namespace SerialProMon
             }
 
             cbShowTimestamp.Checked = true;
+
+            SetupPortWatcher();
         }
 
         // Method to extract the number after "COM"
@@ -135,6 +137,7 @@ namespace SerialProMon
             // Set the new dropdown width
             senderComboBox.DropDownWidth = maxWidth;
         }
+
         private void btnConnect_Click(object sender, EventArgs e)
         {
             if (btnConnect.Text == "Connect")
@@ -476,6 +479,71 @@ namespace SerialProMon
         private void cbShowTimestamp_CheckedChanged(object sender, EventArgs e)
         {
             showTimestamp = cbShowTimestamp.Checked;
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+
+        }
+
+        private void SetupPortWatcher()
+        {
+            string query = "SELECT * FROM __InstanceOperationEvent WITHIN 1 WHERE TargetInstance ISA 'Win32_PnPEntity' AND TargetInstance.Caption LIKE '%(COM%'";
+
+            watcher = new ManagementEventWatcher(new ManagementScope("root\\CIMV2"), new WqlEventQuery(query));
+            watcher.EventArrived += new EventArrivedEventHandler(OnDeviceChanged);
+            watcher.Start();
+        }
+
+        private void OnDeviceChanged(object sender, EventArrivedEventArgs e)
+        {
+            RefreshComPortList();
+        }
+
+        private void RefreshComPortList()
+        {
+            if (InvokeRequired)
+            {
+                // Use Invoke to call the method on the UI thread
+                Invoke(new Action(RefreshComPortList));
+                return;
+            }
+
+            using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE Caption like '%(COM%'"))
+            {
+                if (SerialPort.GetPortNames().Length > 0)
+                {
+                    cbbComPort.Items.Clear();
+
+                    cbbComPort.DropDown += new EventHandler(cbbComPort_DropDown);
+                    var portnames = SerialPort.GetPortNames();
+                    var ports = searcher.Get().Cast<ManagementBaseObject>().ToList().Select(p => p["Caption"].ToString());
+
+                    var portList = portnames.Select(n => n + " - " + ports.FirstOrDefault(s => s.Contains(n))).ToList();
+                    portList.Sort((x, y) =>
+                    {
+                        int numX = ExtractNumber(x);
+                        int numY = ExtractNumber(y);
+                        return numX.CompareTo(numY);
+                    });
+
+                    foreach (string s in portList)
+                    {
+                        cbbComPort.Items.Add(s);
+                    }
+                    cbbComPort.SelectedIndex = 0;
+                }
+                else
+                {
+                    btnConnect.Enabled = false;
+                }
+            }
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            watcher?.Stop();
+            watcher?.Dispose();
         }
     }
 }
